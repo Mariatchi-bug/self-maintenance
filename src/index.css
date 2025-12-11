@@ -1,0 +1,18 @@
+/* src/index.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    'Helvetica Neue', Arial, sans-serif;
+  background: radial-gradient(circle at top left, #ffe9b5, #f3f4f6 40%, #c6e5ff);
+  color: #111827;
+}
+
+#root {
+  min-height: 100vh;
+}
