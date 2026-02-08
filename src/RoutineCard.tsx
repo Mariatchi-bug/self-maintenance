@@ -9,6 +9,7 @@ interface Props {
     season: Season;
     onDone: (data: LogData) => void;
     onSkip: (days: number) => void;
+    onEdit: () => void;
 }
 
 export const RoutineCard: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const RoutineCard: React.FC<Props> = ({
     season,
     onDone,
     onSkip,
+    onEdit,
 }) => {
     const [showModal, setShowModal] = useState(false);
     const { status, daysSince, daysUntil } = getRoutineStatus(routine, new Date(), season);
@@ -83,6 +85,14 @@ export const RoutineCard: React.FC<Props> = ({
                             ))}
                         </div>
                     )}
+                    <button
+                        className="edit-icon-btn"
+                        onClick={onEdit}
+                        title="Edit Routine"
+                        aria-label="Edit Routine"
+                    >
+                        ✎
+                    </button>
                 </div>
                 <div className="title-row">
                     <span className="routine-name">{routine.name}</span>

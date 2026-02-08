@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { useRoutines, useSeason } from './useRoutines';
 import { useTheme } from './useTheme';
 import { RoutineCard } from './RoutineCard';
-import type { FrictionLevel, Season } from './types';
+import { EditRoutineModal } from './EditRoutineModal';
+import type { FrictionLevel, Season, Routine } from './types';
 import { HistoryView } from './HistoryView';
 import { DashboardView } from './DashboardView';
 import { WeeklySummaryView } from './WeeklySummaryView';
@@ -24,10 +25,21 @@ const seasonLabels: Record<Season, string> = {
 };
 
 export const App: React.FC = () => {
-  const { routines, addRoutine, markDone, skipUntil, importRoutines } = useRoutines();
+  const {
+    routines,
+    addRoutine,
+    updateRoutine,
+    markDone,
+    skipUntil,
+    deleteRoutine,
+    updateHistoryEvent,
+    toggleArchive,
+    importRoutines
+  } = useRoutines();
   const { season, setSeason } = useSeason();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<'routines' | 'history' | 'dashboard' | 'weekly' | 'calendar' | 'gallery'>('routines');
+  const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -107,6 +119,9 @@ export const App: React.FC = () => {
   const filteredRoutines = activeTag
     ? routines.filter(r => r.tags.includes(activeTag))
     : routines;
+
+  const activeRoutines = filteredRoutines.filter(r => !r.isArchived);
+  const archivedRoutines = filteredRoutines.filter(r => r.isArchived);
 
   return (
     <div className="app-root">
@@ -218,22 +233,47 @@ export const App: React.FC = () => {
                 </div>
               ) : (
                 <div className="routines-list">
-                  {filteredRoutines.map((routine) => (
+                  {activeRoutines.map((routine) => (
                     <RoutineCard
                       key={routine.id}
                       routine={routine}
                       season={season}
                       onDone={(data) => markDone(routine.id, data)}
                       onSkip={(days) => skipUntil(routine.id, days)}
+                      onEdit={() => setEditingRoutine(routine)}
                     />
                   ))}
                 </div>
               )}
+              <div style={{ marginTop: '32px' }}>
+                {archivedRoutines.length > 0 && (
+                  <details className="idle-section">
+                    <summary style={{ cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>
+                      Idle / Paused Rhythms ({archivedRoutines.length})
+                    </summary>
+                    <div className="routines-list" style={{ opacity: 0.8 }}>
+                      {archivedRoutines.map((routine) => (
+                        <RoutineCard
+                          key={routine.id}
+                          routine={routine}
+                          season={season}
+                          onDone={(data) => markDone(routine.id, data)}
+                          onSkip={(days) => skipUntil(routine.id, days)}
+                          onEdit={() => setEditingRoutine(routine)}
+                        />
+                      ))}
+                    </div>
+                  </details>
+                )}
+              </div>
             </section>
 
           ) : activeTab === 'history' ? (
             <section className="history-section">
-              <HistoryView routines={routines} />
+              <HistoryView
+                routines={routines}
+                onEditLog={updateHistoryEvent}
+              />
             </section>
           ) : activeTab === 'weekly' ? (
             <section className="weekly-section">
@@ -339,6 +379,17 @@ export const App: React.FC = () => {
             />
           </div>
         </section>
+
+        {editingRoutine && (
+          <EditRoutineModal
+            isOpen={true}
+            routine={editingRoutine}
+            onClose={() => setEditingRoutine(null)}
+            onSave={updateRoutine}
+            onDelete={deleteRoutine}
+            onArchive={toggleArchive}
+          />
+        )}
       </div>
     </div >
   );

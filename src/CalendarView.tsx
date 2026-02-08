@@ -1,5 +1,5 @@
-// src/CalendarView.tsx
 import React, { useState, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import type { Routine } from './types';
 
 interface Props {
@@ -114,6 +114,36 @@ export const CalendarView: React.FC<Props> = ({ routines }) => {
 
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+    const modalContent = selectedDay ? (
+        <div className="day-details-overlay" onClick={() => setSelectedDay(null)}>
+            <div className="day-details-panel" onClick={(e) => e.stopPropagation()}>
+                <div className="day-details-header">
+                    <h3>
+                        {selectedDay.date.toLocaleDateString(undefined, {
+                            weekday: 'long',
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric'
+                        })}
+                    </h3>
+                    <button className="close-btn" onClick={() => setSelectedDay(null)} aria-label="Close details">
+                        ×
+                    </button>
+                </div>
+                <div className="day-details-content">
+                    <p className="detail-label">{selectedDay.completions.length} routine{selectedDay.completions.length !== 1 ? 's' : ''} completed:</p>
+                    <ul className="routine-list">
+                        {selectedDay.completions.map((completion, i) => (
+                            <li key={`${completion.routineId}-${i}`} className="routine-item">
+                                {completion.routineName}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    ) : null;
+
     return (
         <div className="calendar-view-container">
             <div className="calendar-header">
@@ -175,36 +205,7 @@ export const CalendarView: React.FC<Props> = ({ routines }) => {
                 })}
             </div>
 
-            {/* Day details modal/panel */}
-            {selectedDay && (
-                <div className="day-details-overlay" onClick={() => setSelectedDay(null)}>
-                    <div className="day-details-panel" onClick={(e) => e.stopPropagation()}>
-                        <div className="day-details-header">
-                            <h3>
-                                {selectedDay.date.toLocaleDateString(undefined, {
-                                    weekday: 'long',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                })}
-                            </h3>
-                            <button className="close-btn" onClick={() => setSelectedDay(null)} aria-label="Close details">
-                                ×
-                            </button>
-                        </div>
-                        <div className="day-details-content">
-                            <p className="detail-label">{selectedDay.completions.length} routine{selectedDay.completions.length !== 1 ? 's' : ''} completed:</p>
-                            <ul className="routine-list">
-                                {selectedDay.completions.map((completion, i) => (
-                                    <li key={`${completion.routineId}-${i}`} className="routine-item">
-                                        {completion.routineName}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {modalContent && ReactDOM.createPortal(modalContent, document.body)}
         </div>
     );
 };

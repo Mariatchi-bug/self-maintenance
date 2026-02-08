@@ -1,5 +1,4 @@
-// src/LogCompletionModal.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import type { LogData } from './types';
 
@@ -8,6 +7,8 @@ interface Props {
     routineName: string;
     onClose: () => void;
     onSave: (data: LogData) => void;
+    initialData?: LogData;
+    title?: string;
 }
 
 export const LogCompletionModal: React.FC<Props> = ({
@@ -15,11 +16,22 @@ export const LogCompletionModal: React.FC<Props> = ({
     routineName,
     onClose,
     onSave,
+    initialData,
+    title,
 }) => {
-    const [note, setNote] = useState('');
-    const [duration, setDuration] = useState<number | ''>('');
-    const [photo, setPhoto] = useState<string | undefined>(undefined);
+    const [note, setNote] = useState(initialData?.note || '');
+    const [duration, setDuration] = useState<number | ''>(initialData?.durationMinutes || '');
+    const [photo, setPhoto] = useState<string | undefined>(initialData?.photo);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Update state when initialData changes or modal opens
+    useEffect(() => {
+        if (isOpen) {
+            setNote(initialData?.note || '');
+            setDuration(initialData?.durationMinutes || '');
+            setPhoto(initialData?.photo);
+        }
+    }, [isOpen, initialData]);
 
     if (!isOpen) return null;
 
@@ -78,7 +90,7 @@ export const LogCompletionModal: React.FC<Props> = ({
     const modalContent = (
         <div className="modal-overlay">
             <div className="modal-content">
-                <h3>Log {routineName}</h3>
+                <h3>{title || `Log ${routineName}`}</h3>
 
                 <label className="modal-field">
                     Note
@@ -138,7 +150,7 @@ export const LogCompletionModal: React.FC<Props> = ({
                         Cancel
                     </button>
                     <button className="primary-btn" onClick={handleSave}>
-                        Save Log
+                        {initialData ? 'Save Changes' : 'Save Log'}
                     </button>
                 </div>
             </div>

@@ -124,6 +124,49 @@ export function useRoutines() {
         setRoutines((prev) => prev.filter((r) => r.id !== id));
     };
 
+    const updateHistoryEvent = (routineId: string, eventIndex: number, patch: Partial<import('./types').CompletionEvent>) => {
+        setRoutines((prev) =>
+            prev.map((r) => {
+                if (r.id !== routineId) return r;
+                const newHistory = [...(r.history || [])];
+                if (newHistory[eventIndex]) {
+                    newHistory[eventIndex] = { ...newHistory[eventIndex], ...patch };
+                }
+                // If the most recent one (index 0 usually) changed, update lastCompletedAt?
+                // For simplicity, we won't auto-recalculate lastCompletedAt based on history editing unless needed.
+                // But if the date changed, we SHOULD re-sort?
+                // Let's assume for now we just patch it.
+                return { ...r, history: newHistory };
+            })
+        );
+    };
+
+    const deleteHistoryEvent = (routineId: string, eventIndex: number) => {
+        setRoutines((prev) =>
+            prev.map((r) => {
+                if (r.id !== routineId) return r;
+                const newHistory = r.history?.filter((_, idx) => idx !== eventIndex) || [];
+
+                // If we deleted the most recent event, we might want to update lastCompletedAt
+                // A simple heuristic: take the new first item's date, or null
+                let newLastCompleted = r.lastCompletedAt;
+                if (eventIndex === 0) { // Assuming history is sorted desc
+                    newLastCompleted = newHistory.length > 0 ? newHistory[0].date : null;
+                }
+
+                return { ...r, history: newHistory, lastCompletedAt: newLastCompleted };
+            })
+        );
+    };
+
+    const toggleArchive = (id: string) => {
+        setRoutines((prev) =>
+            prev.map((r) =>
+                r.id === id ? { ...r, isArchived: !r.isArchived } : r
+            )
+        );
+    };
+
     return {
         routines,
         addRoutine,
@@ -131,6 +174,9 @@ export function useRoutines() {
         markDone,
         skipUntil,
         deleteRoutine,
+        updateHistoryEvent,
+        deleteHistoryEvent,
+        toggleArchive,
         importRoutines,
     };
 }

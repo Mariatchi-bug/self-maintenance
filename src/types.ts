@@ -28,4 +28,5 @@ export interface Routine {
   skippedUntil: string | null; // ISO string, for postponing on purpose
   history: CompletionEvent[]; // Log of all completion events
   cadenceBySeason?: Partial<Record<Season, number>>; // optional overrides
+  isArchived?: boolean;
 }

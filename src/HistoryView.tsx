@@ -1,12 +1,15 @@
-// src/HistoryView.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import type { Routine } from './types';
+import { LogCompletionModal } from './LogCompletionModal';
 
 interface Props {
     routines: Routine[];
+    onEditLog?: (routineId: string, eventIndex: number, data: any) => void;
 }
 
 interface HistoryEvent {
+    routineId: string;
+    eventIndex: number;
     id: string;
     routineName: string;
     date: Date;
@@ -15,7 +18,9 @@ interface HistoryEvent {
     photo?: string;
 }
 
-export const HistoryView: React.FC<Props> = ({ routines }) => {
+export const HistoryView: React.FC<Props> = ({ routines, onEditLog }) => {
+    const [editingEvent, setEditingEvent] = useState<HistoryEvent | null>(null);
+
     // Flatten all history into a single timeline
     const events: HistoryEvent[] = routines
         .flatMap((r) =>
@@ -27,6 +32,8 @@ export const HistoryView: React.FC<Props> = ({ routines }) => {
                 const photo = isString ? undefined : eventOrString.photo;
 
                 return {
+                    routineId: r.id,
+                    eventIndex: index,
                     id: `${r.id}-${index}`,
                     routineName: r.name,
                     date: new Date(dateStr),
@@ -85,6 +92,16 @@ export const HistoryView: React.FC<Props> = ({ routines }) => {
                                             hour: 'numeric',
                                             minute: '2-digit',
                                         })}
+                                        {onEditLog && (
+                                            <button
+                                                className="edit-icon-btn"
+                                                onClick={() => setEditingEvent(event)}
+                                                style={{ marginLeft: '8px' }}
+                                                title="Edit Entry"
+                                            >
+                                                ✎
+                                            </button>
+                                        )}
                                     </span>
                                 </div>
                                 {event.photo && (
@@ -97,6 +114,26 @@ export const HistoryView: React.FC<Props> = ({ routines }) => {
                     </ul>
                 </div>
             ))}
+
+            {editingEvent && (
+                <LogCompletionModal
+                    isOpen={true}
+                    routineName={editingEvent.routineName}
+                    title="Edit Log"
+                    initialData={{
+                        note: editingEvent.note,
+                        durationMinutes: editingEvent.durationMinutes,
+                        photo: editingEvent.photo
+                    }}
+                    onClose={() => setEditingEvent(null)}
+                    onSave={(data) => {
+                        if (onEditLog) {
+                            onEditLog(editingEvent.routineId, editingEvent.eventIndex, data);
+                            setEditingEvent(null);
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 };

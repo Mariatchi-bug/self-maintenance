@@ -273,12 +273,13 @@ body {
 }
 
 .header-blob {
-  margin-left: auto;
   width: 72px;
   height: 72px;
   border-radius: 50%;
   background: var(--gradient-header-blob);
   box-shadow: 0 0 20px rgba(var(--color-accent-green), 0.3);
+  flex-shrink: 0;
+  /* Prevent squashing */
   /* Removed 'animation: float' here to stop it moving vertically which looked glitchy */
 }
 
@@ -297,12 +298,16 @@ body {
   font-size: 1.2rem;
   transition: all 0.2s ease;
   margin-left: auto;
+  flex-shrink: 0;
+  /* Prevent squashing */
 }
 
 .theme-toggle:hover {
   transform: scale(1.05);
   background: var(--color-bg-hover);
 }
+
+
 
 /* Controls */
 
@@ -604,6 +609,43 @@ body {
   padding-left: 4px;
 }
 
+/* Mobile Responsiveness */
+@media (max-width: 700px) {
+  .control-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .view-toggle {
+    width: 100%;
+    margin-right: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* smooth scroll on iOS */
+    padding-bottom: 8px;
+    /* space for scrollbar if visible, or just padding */
+  }
+
+  /* Hide scrollbar for cleaner look but keep functionality */
+  .view-toggle::-webkit-scrollbar {
+    height: 0px;
+    background: transparent;
+  }
+
+  .view-toggle button {
+    flex-shrink: 0;
+    /* prevent squishing */
+    white-space: nowrap;
+  }
+
+  .season-select {
+    align-self: flex-start;
+    /* align left */
+    margin-left: 4px;
+  }
+}
+
 .history-list {
   list-style: none;
   margin: 0;
@@ -719,6 +761,24 @@ body {
 .card-tags {
   display: flex;
   gap: 4px;
+}
+
+.edit-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  margin-left: auto;
+  /* Push to right if needed, but flex gap handles it */
+}
+
+.edit-icon-btn:hover {
+  opacity: 1;
+  color: var(--color-text-primary);
 }
 
 .card-tag {
@@ -1503,6 +1563,7 @@ body {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1511,7 +1572,7 @@ body {
 }
 
 .day-details-panel {
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg-card);
   /* Restore solid bg for readability */
   /* backdrop-filter: blur(12px); Removed to fix transparency glitch */
   border-radius: 24px;
