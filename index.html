@@ -7,38 +7,10 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <link rel="apple-touch-icon" href="/vite.svg" />
   <meta name="theme-color" content="#ffffff" />
-  <script>
-    // Set up error handlers immediately (before body exists)
-    window.onerror = function (msg, url, lineNo, columnNo, error) {
-      var message = 'Global Error:\nMessage: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + ':' + columnNo + '\nStack: ' + (error ? error.stack : 'N/A');
-      alert(message);
-      return false;
-    };
-    window.addEventListener('unhandledrejection', function (event) {
-      alert('Unhandled Rejection: ' + (event.reason ? (event.reason.stack || event.reason) : event.reason));
-    });
-  </script>
-  <style>
-    #debug-banner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: yellow;
-      color: black;
-      z-index: 99999;
-      padding: 10px;
-      font-family: monospace;
-      text-align: center;
-      border-bottom: 3px solid red;
-      font-size: 14px;
-    }
-  </style>
   <title>self-maintenance</title>
 </head>
 
 <body>
-  <div id="debug-banner">DEBUG MODE ACTIVE - If you see this, HTML is loading correctly</div>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
