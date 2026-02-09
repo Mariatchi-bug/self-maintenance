@@ -8,51 +8,37 @@
   <link rel="apple-touch-icon" href="/vite.svg" />
   <meta name="theme-color" content="#ffffff" />
   <script>
-    (function () {
-      // Create a visual indicator that JS is running
-      var statusDiv = document.createElement('div');
-      statusDiv.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: yellow; color: black; z-index: 21000; padding: 5px; font-family: monospace; text-align: center; border-bottom: 1px solid black; font-size: 12px;';
-      statusDiv.innerHTML = 'DEBUG MODE: JS Running on ' + navigator.userAgent;
-      document.body.appendChild(statusDiv);
-
-      var errorContainer = document.createElement('div');
-      errorContainer.style.cssText = 'position: fixed; top: 30px; left: 0; width: 100%; height: calc(100% - 30px); background: rgba(255,255,255,0.95); color: black; z-index: 20000; overflow: auto; padding: 20px; font-family: monospace; display: none; border: 5px solid red;';
-      document.body.appendChild(errorContainer);
-
-      function showError(msg) {
-        errorContainer.style.display = 'block';
-        var p = document.createElement('div');
-        p.style.marginBottom = '10px';
-        p.style.borderBottom = '1px solid #ccc';
-        p.style.paddingBottom = '5px';
-        p.style.color = 'red';
-        p.innerText = msg;
-        errorContainer.appendChild(p);
-      }
-
-      window.onerror = function (msg, url, lineNo, columnNo, error) {
-        var message = [
-          'Global Error:',
-          'Message: ' + msg,
-          'URL: ' + url,
-          'Line: ' + lineNo + ':' + columnNo,
-          'Stack: ' + (error ? error.stack : 'N/A')
-        ].join('\n');
-        showError(message);
-        return false;
-      };
-
-      window.addEventListener('unhandledrejection', function (event) {
-        showError('Unhandled Rejection: ' + (event.reason ? (event.reason.stack || event.reason) : event.reason));
-      });
-
-      console.log('Debug logger initialized');
-    })();
+    // Set up error handlers immediately (before body exists)
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+      var message = 'Global Error:\nMessage: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + ':' + columnNo + '\nStack: ' + (error ? error.stack : 'N/A');
+      alert(message);
+      return false;
+    };
+    window.addEventListener('unhandledrejection', function (event) {
+      alert('Unhandled Rejection: ' + (event.reason ? (event.reason.stack || event.reason) : event.reason));
+    });
   </script>
+  <style>
+    #debug-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: yellow;
+      color: black;
+      z-index: 99999;
+      padding: 10px;
+      font-family: monospace;
+      text-align: center;
+      border-bottom: 3px solid red;
+      font-size: 14px;
+    }
+  </style>
   <title>self-maintenance</title>
 </head>
 
 <body>
+  <div id="debug-banner">DEBUG MODE ACTIVE - If you see this, HTML is loading correctly</div>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
