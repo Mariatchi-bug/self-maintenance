@@ -11,6 +11,7 @@ export default defineConfig({
     react(),
     legacy({
       targets: ['defaults', 'not IE 11', 'ios >= 12'],
+      modernPolyfills: true,
     }),
     VitePWA({
       registerType: 'autoUpdate',
